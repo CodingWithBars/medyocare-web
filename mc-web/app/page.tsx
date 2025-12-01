@@ -1,46 +1,49 @@
-import Image from "next/image";
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [studentId, setStudentId] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (studentId.trim()) {
+      router.push(`/student/${studentId.trim()}`);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black font-sans">
-      <main className="flex w-full max-w-4xl flex-col items-center justify-center gap-12 p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
-        {/* Logo */}
-        <div className="flex items-center gap-4">
-          <Image src="/next.svg" alt="Next.js Logo" width={60} height={20} className="dark:invert" />
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">MedyoCare Portal</h1>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-gray-900 font-sans">
+      <main className="flex w-full max-w-3xl flex-col items-center gap-12 p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
+        {/* Header */}
+        <h1 className="text-4xl font-bold text-teal-700 dark:text-teal-400 text-center">
+          MedyoCare Student Portal
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 text-center">
+          Access student medical records, clinic visits, and reports. Enter a student ID below.
+        </p>
 
-        {/* Intro */}
-        <div className="text-center sm:text-left">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2">
-            Welcome to the Student Medical Portal
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-xl">
-            Access student medical records, clinic visits, reports, and documents. Use the student ID to navigate directly to a student profile.
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link
-            href="/student"
-            className="flex items-center justify-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-white font-semibold transition hover:bg-teal-700"
+        {/* Search Form */}
+        <form onSubmit={handleSubmit} className="w-full flex flex-col sm:flex-row gap-4 justify-center">
+          <input
+            type="text"
+            value={studentId}
+            onChange={(e) => setStudentId(e.target.value)}
+            placeholder="Enter Student ID (e.g., 2023-6015)"
+            className="w-full sm:w-auto flex-1 border border-gray-300 dark:border-gray-600 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-700 dark:text-white"
+          />
+          <button
+            type="submit"
+            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded font-semibold transition"
           >
-            View Students
-          </Link>
-          <a
-            href="https://nextjs.org/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          >
-            Documentation
-          </a>
-        </div>
+            Go
+          </button>
+        </form>
 
-        {/* Footer / Info */}
-        <p className="text-gray-500 dark:text-gray-400 mt-8 text-sm">
+        {/* Footer */}
+        <p className="text-gray-500 dark:text-gray-400 text-sm text-center mt-8">
           MedyoCare &copy; 2025 – Developed with Next.js & MongoDB
         </p>
       </main>

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic"; // runtime rendering
 export const revalidate = 0;           // disable ISR, always fetch fresh
 
 import PatientInfoCard from "@/components/PatientInfoCard";
-import DocumentsList from "@/components/DocumentsList";
+// import DocumentsList from "@/components/DocumentsList";
 import ClinicVisitsList from "@/components/ClinicVisitsList";
 import ReportsList from "@/components/ReportsList";
 import clientPromise from "@/lib/mongodb";
