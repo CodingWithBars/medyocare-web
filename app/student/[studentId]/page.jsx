@@ -1,8 +1,7 @@
-export const dynamic = "force-dynamic"; // runtime rendering
-export const revalidate = 0;           // disable ISR, always fetch fresh
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import PatientInfoCard from "@/components/PatientInfoCard";
-// import DocumentsList from "@/components/DocumentsList";
 import ClinicVisitsList from "@/components/ClinicVisitsList";
 import ReportsList from "@/components/ReportsList";
 import clientPromise from "@/lib/mongodb";
@@ -13,7 +12,8 @@ export default async function StudentPage({ params }) {
   const client = await clientPromise;
   const db = client.db("medcare_db");
 
-  const patient = await db.collection("patients").findOne({ patient_id: studentId });
+  // FIX: use student_id instead of patient_id
+  const patient = await db.collection("patients").findOne({ student_id: studentId });
 
   if (!patient) {
     return (
@@ -24,14 +24,21 @@ export default async function StudentPage({ params }) {
     );
   }
 
-  // const documents = await db.collection("patient_documents").find({ patient_id: patient.patient_id }).toArray();
-  const visits = await db.collection("clinic_visits").find({ patient_id: patient.patient_id }).sort({ visit_date: -1 }).toArray();
-  const reports = await db.collection("reports").find({ patient_id: patient.patient_id }).sort({ created_at: -1 }).toArray();
+  // FIX: also query visits using student_id
+  const visits = await db.collection("clinic_visits")
+    .find({ student_id: studentId })
+    .sort({ visit_date: -1 })
+    .toArray();
+
+  // FIX: query reports using student_id
+  const reports = await db.collection("reports")
+    .find({ student_id: studentId })
+    .sort({ created_at: -1 })
+    .toArray();
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <PatientInfoCard patient={patient} />
-      {/* <DocumentsList documents={documents} /> */}
       <ClinicVisitsList visits={visits} />
       <ReportsList reports={reports} />
     </div>
