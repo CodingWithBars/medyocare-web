@@ -10,7 +10,7 @@ export default async function StudentPage({ params }) {
   const studentId = params.studentId;
 
   const client = await clientPromise;
-  const db = client.db("medcare_db");
+  const db = client.db("medyocare_db");
 
   // FIX: use student_id instead of patient_id
   const patient = await db.collection("patients").findOne({ student_id: studentId });
