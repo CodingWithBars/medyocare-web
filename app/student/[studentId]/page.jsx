@@ -6,13 +6,12 @@ import ClinicVisitsList from "@/components/ClinicVisitsList";
 import ReportsList from "@/components/ReportsList";
 import clientPromise from "@/lib/mongodb";
 
-export default async function StudentPage({ params }) {
-  const studentId = params.studentId;
+export default async function StudentPage(props) {
+  const { studentId } = await props.params; // 👈 NEW FIX
 
   const client = await clientPromise;
-  const db = client.db("medyocare_db");
+  const db = client.db("medcare_db");
 
-  // FIX: use student_id instead of patient_id
   const patient = await db.collection("patients").findOne({ student_id: studentId });
 
   if (!patient) {
@@ -24,13 +23,11 @@ export default async function StudentPage({ params }) {
     );
   }
 
-  // FIX: also query visits using student_id
   const visits = await db.collection("clinic_visits")
     .find({ student_id: studentId })
     .sort({ visit_date: -1 })
     .toArray();
 
-  // FIX: query reports using student_id
   const reports = await db.collection("reports")
     .find({ student_id: studentId })
     .sort({ created_at: -1 })
