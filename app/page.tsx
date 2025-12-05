@@ -128,13 +128,13 @@ export default function Home() {
           About MedyoCare – DorSu Campus Clinic
         </h2>
         <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          MedyoCare at DorSu Banay-Banay Campus provides comprehensive healthcare services to students including routine check-ups, immunizations, emergency care, and health education. Our mission is to ensure the well-being of every student on campus.
+          MedyoCare at DOrSU Banay-Banay Campus provides comprehensive healthcare services to students including routine check-ups, immunizations, emergency care, and health education. Our mission is to ensure the well-being of every student on campus.
         </p>
       </section>
 
       {/* Footer */}
       <footer className="text-center py-6 border-t border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
-        MedyoCare – DorSu Banay-Banay Campus Clinic &copy; 2025 – Developed with Next.js & MongoDB
+        MedyoCare – DOrSU Banay-Banay Campus Clinic &copy; 2025 – Developed with Next.js & MongoDB
       </footer>
     </div>
   );
