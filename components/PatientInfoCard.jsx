@@ -8,13 +8,32 @@ import {
   FaPhoneAlt,
   FaUserMd,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 export default function PatientInfoCard({ patient }) {
   if (!patient) return null;
 
-  const handleNotifyEmergencyContact = () => {
-    alert(`Emergency contact for ${patient.firstname} has been notified!`);
-  };
+  const handleNotifyEmergencyContact = async () => {
+  const loadingToast = toast.loading("Sending notification...");
+
+  const res = await fetch("/api/notify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      patientName: `${patient.firstname} ${patient.lastname}`,
+      contactName: patient.emergency_contact_name,
+      contactPhone: patient.emergency_contact_phone,
+    }),
+  });
+
+  toast.dismiss(loadingToast);
+
+  if (res.ok) {
+    toast.success("Emergency contact notified via SMS!");
+  } else {
+    toast.error("Failed to send SMS notification.");
+  }
+};
 
   return (
     <div className="bg-white shadow-lg rounded-2xl max-w-4xl mx-auto p-6 space-y-6">
