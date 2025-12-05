@@ -134,8 +134,16 @@ export default function PatientInfoCard({ patient }) {
         onClick={handleNotifyEmergencyContact}
         className="w-full bg-teal-600 dark:bg-teal-500 text-white dark:text-gray-900 py-3 rounded-xl shadow hover:bg-teal-700 dark:hover:bg-teal-600 transition flex items-center justify-center gap-2 text-lg font-semibold"
       >
-        <FaPhoneAlt /> Notify Emergency Contact
+        <FaExclamationTriangle /> Notify Emergency Contact
       </button>
+
+      {/* Call Button */}
+      <a
+        href={`tel:${patient.emergency_contact_phone}`}
+        className="w-full block bg-teal-50 dark:bg-gray-700 text-teal-700 dark:text-teal-400 py-3 rounded-xl shadow hover:bg-teal-100 dark:hover:bg-gray-600 transition text-center font-semibold mt-2"
+      >
+        <FaPhoneAlt className="inline mr-2" /> Call Emergency Contact
+      </a>
     </div>
   );
 }
