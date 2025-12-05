@@ -19,7 +19,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center flex-1 p-8 text-center bg-teal-50 dark:bg-gray-800">
         <h1 className="text-5xl font-bold text-teal-700 dark:text-teal-400 mb-4">
-          MedyoCare for DorSu Banay-Banay Campus Clinic
+          MedyoCare for DOrSU Banay-Banay Campus Clinic
         </h1>
         <p className="text-gray-600 dark:text-gray-300 max-w-xl mb-8">
           Your one-stop portal for student medical records, announcements, and campus health updates.  
@@ -39,7 +39,7 @@ export default function Home() {
             type="submit"
             className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded font-semibold transition"
           >
-            Go
+            View
           </button>
         </form>
       </section>
