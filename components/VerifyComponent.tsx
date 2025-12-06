@@ -1,9 +1,9 @@
-"use client";
+"use client"; // Must be first line
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function VerifyClient() {
+export default function VerifyComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams?.get("email") || "";
@@ -13,7 +13,6 @@ export default function VerifyClient() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Redirect if user already logged in
   useEffect(() => {
     const session = localStorage.getItem("session");
     if (session) router.replace("/dashboard");
