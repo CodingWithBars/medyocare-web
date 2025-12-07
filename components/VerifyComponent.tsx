@@ -1,4 +1,4 @@
-"use client"; // Must be first line
+"use client";
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,15 +25,13 @@ export default function VerifyComponent() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/verify-code", {
+      const res = await fetch("/api/verify-login", {  // <--- updated URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailParam, code }),
       });
 
-      const data = await res.json().catch(() => {
-        throw new Error("Invalid server response.");
-      });
+      const data = await res.json();
 
       if (!res.ok || !data.success) {
         setError(data.message || "Invalid or expired code.");
@@ -41,7 +39,10 @@ export default function VerifyComponent() {
         return;
       }
 
-      localStorage.setItem("session", JSON.stringify(data.user));
+      // Save verified session
+      localStorage.setItem("session", JSON.stringify(data.userSession));
+      localStorage.removeItem("pendingLogin");
+
       setSuccess(true);
       setLoading(false);
 
@@ -73,13 +74,12 @@ export default function VerifyComponent() {
             maxLength={4}
             required
           />
-
           <button
             type="submit"
+            disabled={loading}
             className={`bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition font-semibold ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={loading}
           >
             {loading ? "Verifying..." : "Verify Code"}
           </button>

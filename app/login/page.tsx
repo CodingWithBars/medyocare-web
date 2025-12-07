@@ -7,25 +7,20 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [studentId, setStudentId] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  // Redirect to dashboard if already logged in
   useEffect(() => {
     const session = localStorage.getItem("session");
-    if (session) {
-      router.replace("/dashboard");
-    }
+    if (session) router.replace("/dashboard");
   }, [router]);
 
   const sendCode = async (e: FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
+    setMessage(null);
 
-    if (!email || !studentId) {
-      setError("Please enter both email and student ID.");
+    if (!email.trim() || !studentId.trim()) {
+      setMessage({ type: "error", text: "Please enter both email and student ID." });
       return;
     }
 
@@ -38,24 +33,25 @@ export default function LoginPage() {
         body: JSON.stringify({ email, studentId }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => {
+        throw new Error("Invalid server response");
+      });
 
       if (!res.ok || !data.ok) {
-        setError(data.message || "Invalid email or student ID");
+        setMessage({ type: "error", text: data?.message || "Invalid email or student ID." });
         setLoading(false);
         return;
       }
 
-      setSuccess(true);
-      setLoading(false);
+      // Save pending login in localStorage
+      localStorage.setItem("pendingLogin", JSON.stringify({ email, studentId }));
 
-      // Redirect to verification page after a short delay
-      setTimeout(() => {
-        router.push(`/verify?email=${encodeURIComponent(email)}`);
-      }, 1500);
+      setMessage({ type: "success", text: `Verification code sent to ${email}!` });
+      setTimeout(() => router.push(`/verify?email=${encodeURIComponent(email)}`), 1500);
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Please try again.");
+      setMessage({ type: "error", text: "Something went wrong. Please try again." });
+    } finally {
       setLoading(false);
     }
   };
@@ -63,12 +59,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-blue-50 flex items-center justify-center">
       <div className="bg-white p-8 shadow-lg rounded-2xl w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4 text-blue-900">Student Login</h1>
+        <h1 className="text-2xl font-bold mb-4 text-blue-900 text-center">Student Login</h1>
 
-        {error && <p className="text-red-600 mb-2">{error}</p>}
-        {success && (
-          <p className="text-green-600 mb-2">
-            Verification code sent to <b>{email}</b>!
+        {message && (
+          <p className={`mb-2 ${message.type === "error" ? "text-red-600" : "text-green-600"}`}>
+            {message.text}
           </p>
         )}
 
@@ -77,26 +72,26 @@ export default function LoginPage() {
             type="email"
             placeholder="Student Email"
             value={email}
-            className="border p-3 rounded"
             onChange={(e) => setEmail(e.target.value)}
+            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
             required
           />
-
           <input
             type="text"
             placeholder="Student ID"
             value={studentId}
-            className="border p-3 rounded"
             onChange={(e) => setStudentId(e.target.value)}
+            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
             required
           />
-
           <button
             type="submit"
-            className={`bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition ${
+            disabled={loading}
+            className={`bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition font-semibold ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={loading}
           >
             {loading ? "Sending..." : "Send Verification Code"}
           </button>
