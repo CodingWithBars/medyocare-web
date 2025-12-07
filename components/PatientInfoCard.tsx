@@ -1,39 +1,36 @@
+// components/PatientInfoCard.tsx
 "use client";
 
-import {
-  FaExclamationTriangle,
-  FaPhoneAlt,
-  FaUserMd,
-} from "react-icons/fa";
+import { FaExclamationTriangle, FaPhoneAlt, FaUserMd } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-// Define Patient type
 interface Patient {
-  firstname: string;
-  lastname: string;
-  email: string;
-  emergency_contact_name: string;
-  emergency_contact_phone: string;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
   blood_type?: string;
   gender?: string;
   allergies?: string;
-  profile_image?: string;
+  profileImageUrl?: string | null;
 }
 
 // Helper functions for masking
-function maskName(name: string) {
+function maskName(name?: string) {
   if (!name) return "";
-  const parts = name.split(" ");
-  return parts.map(p => p[0] + "*".repeat(Math.max(1, p.length - 1))).join(" ");
+  return name
+    .split(" ")
+    .map((p) => p[0] + "*".repeat(Math.max(1, p.length - 1)))
+    .join(" ");
 }
 
-function maskEmail(email: string) {
+function maskEmail(email?: string) {
   if (!email) return "";
   const [user, domain] = email.split("@");
-  const maskedUser = user.slice(0, 3) + "***";
+  if (!domain) return email;
   const [domainName, extension] = domain.split(".");
-  const maskedDomain = domainName.slice(0, 3) + "***";
-  return `${maskedUser}@${maskedDomain}.${extension}`;
+  return `${user.slice(0, 3)}***@${domainName?.slice(0, 3)}***.${extension}`;
 }
 
 interface PatientInfoCardProps {
@@ -43,7 +40,8 @@ interface PatientInfoCardProps {
 export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
   if (!patient) return null;
 
-  const safeName = maskName(`${patient.firstname} ${patient.lastname}`);
+  const fullName = `${patient.firstname || ""} ${patient.lastname || ""}`;
+  const safeName = maskName(fullName);
   const safeEmail = maskEmail(patient.email);
 
   const handleNotifyEmergencyContact = async () => {
@@ -61,12 +59,8 @@ export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
       });
 
       toast.dismiss(loadingToast);
-
-      if (res.ok) {
-        toast.success("Emergency contact notified via SMS!");
-      } else {
-        toast.error("Failed to send SMS notification.");
-      }
+      if (res.ok) toast.success("Emergency contact notified via SMS!");
+      else toast.error("Failed to send SMS notification.");
     } catch (err) {
       toast.dismiss(loadingToast);
       console.error(err);
@@ -76,25 +70,31 @@ export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
 
   return (
     <div className="bg-teal-50 shadow-lg rounded-2xl max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header / Profile */}
+      {/* Profile */}
       <div className="flex flex-col items-center text-center">
-        <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center text-2xl font-bold text-teal-600 shadow">
-          {patient.firstname?.[0]}{patient.lastname?.[0]}
-        </div>
-
-        <h2 className="mt-4 text-2xl font-bold text-teal-700">
-          {safeName}
-        </h2>
-
+        {patient.profileImageUrl ? (
+          <img
+            src={patient.profileImageUrl}
+            alt={fullName}
+            className="w-32 h-32 rounded-full object-cover border-2 border-gray-300"
+          />
+        ) : (
+          <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center text-2xl font-bold text-teal-600 shadow">
+            {patient.firstname?.[0] || "?"}
+            {patient.lastname?.[0] || "?"}
+          </div>
+        )}
+        <h2 className="mt-4 text-2xl font-bold text-teal-700">{safeName}</h2>
         <p className="text-gray-700 mt-1">{safeEmail}</p>
       </div>
 
-      {/* Emergency / Medical Info */}
+      {/* Medical info */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-white p-4 rounded-xl shadow-sm flex items-center gap-3">
           <FaUserMd className="text-teal-500 text-xl" />
           <span className="text-gray-900">
-            <strong>Emergency Contact:</strong> {patient.emergency_contact_name || "N/A"}
+            <strong>Emergency Contact:</strong>{" "}
+            {patient.emergency_contact_name || "N/A"}
           </span>
         </div>
 
@@ -139,7 +139,7 @@ export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
         )}
       </div>
 
-      {/* Action Buttons */}
+      {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-4 mt-4">
         <button
           onClick={handleNotifyEmergencyContact}
