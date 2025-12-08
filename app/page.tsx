@@ -56,12 +56,6 @@ export default function Home() {
 
       <SearchStudent />
 
-      {/* Announcements Section */}
-      <EventsSection />
-
-      {/* About the Clinic */}
-      <AboutSection />
-
       {/* Footer */}
       <Footer />
     </div>

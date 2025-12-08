@@ -143,7 +143,7 @@ export default function PatientInfoCard({ patient }: PatientInfoCardProps) {
       <div className="flex flex-col sm:flex-row gap-4 mt-4">
         <button
           onClick={handleNotifyEmergencyContact}
-          className="flex-1 bg-teal-600 text-white py-3 rounded-xl shadow hover:bg-teal-700 transition flex items-center justify-center gap-2 font-semibold"
+          className="flex-1 bg-blue-600 text-white py-3 rounded-xl shadow hover:bg-blue-700 transition flex items-center justify-center gap-2 font-semibold"
         >
           <FaExclamationTriangle /> Notify Emergency Contact
         </button>
