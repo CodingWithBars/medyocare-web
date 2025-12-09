@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, useEffect, FormEvent, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function VerifyComponent() {
@@ -8,24 +8,57 @@ export default function VerifyComponent() {
   const searchParams = useSearchParams();
   const emailParam = searchParams?.get("email") || "";
 
-  const [code, setCode] = useState("");
+  const [digits, setDigits] = useState(["", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const inputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   useEffect(() => {
     const session = localStorage.getItem("session");
     if (session) router.replace("/dashboard");
   }, [router]);
 
+  const handleChange = (value: string, index: number) => {
+    if (!/^[0-9]?$/.test(value)) return; // Allow only numbers
+
+    const newDigits = [...digits];
+    newDigits[index] = value;
+    setDigits(newDigits);
+
+    if (value !== "" && index < 3) {
+      inputRefs[index + 1].current?.focus();
+    }
+  };
+
+  const handleBack = (index: number) => {
+    if (digits[index] === "" && index > 0) {
+      inputRefs[index - 1].current?.focus();
+    }
+  };
+
   const verifyCode = async (e: FormEvent) => {
     e.preventDefault();
+
+    const code = digits.join("");
+
+    if (code.length !== 4) {
+      setError("Please enter a 4-digit code.");
+      return;
+    }
+
     setError("");
     setSuccess(false);
     setLoading(true);
 
     try {
-      const res = await fetch("/api/verify-login", {  // <--- updated URL
+      const res = await fetch("/api/verify-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailParam, code }),
@@ -39,7 +72,6 @@ export default function VerifyComponent() {
         return;
       }
 
-      // Save verified session
       localStorage.setItem("session", JSON.stringify(data.userSession));
       localStorage.removeItem("pendingLogin");
 
@@ -65,20 +97,29 @@ export default function VerifyComponent() {
         {success && <p className="text-green-600 mb-2">Code verified! Redirecting...</p>}
 
         <form onSubmit={verifyCode} className="flex flex-col gap-4">
-          <input
-            type="text"
-            placeholder="Enter 4-digit code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            maxLength={4}
-            required
-          />
+          <div className="flex justify-center gap-4">
+            {digits.map((digit, i) => (
+              <input
+                key={i}
+                ref={inputRefs[i]}
+                type="text"
+                maxLength={1}
+                value={digit}
+                className="border w-14 h-14 text-center text-2xl rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                onChange={(e) => handleChange(e.target.value, i)}
+                onKeyDown={(e) => {
+                  if (e.key === "Backspace") handleBack(i);
+                }}
+                required
+              />
+            ))}
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className={`bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition font-semibold ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
+            className={`bg-blue-600 text-white p-3 rounded font-semibold transition ${
+              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
             }`}
           >
             {loading ? "Verifying..." : "Verify Code"}
