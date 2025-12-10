@@ -17,46 +17,61 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      const sessionStr = localStorage.getItem("session");
-      if (!sessionStr) return router.replace("/login");
+  const fetchDashboard = async () => {
+    const sessionStr = localStorage.getItem("session");
+    if (!sessionStr) return router.replace("/login");
 
-      const session = JSON.parse(sessionStr);
-      const studentId = session.studentId || session.student_id;
-      if (!studentId) return router.replace("/login");
+    const session = JSON.parse(sessionStr);
+    const studentId = session.studentId || session.student_id;
+    if (!studentId) return router.replace("/login");
 
-      try {
-        // Fetch main dashboard data
-        const res = await fetch(`/api/dashboard?studentId=${encodeURIComponent(studentId)}`);
-        const data = await res.json();
-        if (!res.ok || !data.success) return router.replace("/login");
+    try {
+      // Fetch main dashboard data
+      const res = await fetch(`/api/dashboard?studentId=${encodeURIComponent(studentId)}`);
+      const data = await res.json();
+      if (!res.ok || !data.success) return router.replace("/login");
 
-        setPatient(data.patient);
-        setVisits(data.visits);
-        setReports(data.reports);
+      setPatient(data.patient);
 
-        // Fetch appointments separately
-        const apptRes = await fetch(`/api/appointments?studentId=${encodeURIComponent(studentId)}`);
-        const apptData = await apptRes.json();
-        if (apptData.success && apptData.appointments) {
-          setAppointments(apptData.appointments);
-        }
+      // Map raw visits to ClinicVisit type
+      const formattedVisits = (data.visits || []).map((v: any) => ({
+        _id: v._id?.toString(),
+        id: v.id || v._id?.toString(),
+        student_name: v.student_name,
+        student_id: v.student_id,
+        visit_time: v.visit_time,
+        status: v.status || "Pending",
+        reason: v.reason,
+        recommendation: v.recommendation,
+        doctor_name: v.doctor_name,
+        notes: v.notes,
+        created_at: v.created_at,
+      }));
+      setVisits(formattedVisits);
 
-        // Fetch medications separately
-        const medsRes = await fetch(`/api/medications?studentId=${encodeURIComponent(studentId)}`);
-        const medsData = await medsRes.json();
-        if (medsData.success && medsData.medications) {
-          setMedications(medsData.medications);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      // Map medications to Medication type
+      const formattedMeds = (await fetch(`/api/medications?studentId=${encodeURIComponent(studentId)}`)
+        .then((r) => r.json())
+        .then((m) => m.medications || [])).map((med: any) => ({
+        id: med._id?.$oid || med.id || "",
+        name: med.name,
+        dosage: med.dosage,
+        frequency: med.frequency,
+        schedule: med.schedule,
+        notes: med.notes,
+        created_at: med.created_at,
+      }));
+      setMedications(formattedMeds);
 
-    fetchDashboard();
-  }, [router]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDashboard();
+}, [router]);
 
   if (loading) return <div className="p-6 text-center">Loading dashboard...</div>;
   if (!patient)
@@ -79,13 +94,6 @@ export default function DashboardPage() {
         <ClinicVisitsList visits={visits} />
       ) : (
         <p className="text-gray-500 text-center italic">No clinic visits</p>
-      )}
-
-      {/* Appointments */}
-      {appointments.length > 0 ? (
-        <PatientAppointmentsList appointments={appointments} />
-      ) : (
-        <p className="text-gray-500 text-center italic">No appointments</p>
       )}
 
       {/* Medications */}

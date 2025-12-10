@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+// app/api/upload/[filename]/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, GridFSBucket } from "mongodb";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 const DATABASE_NAME = "medcare_db";
+
 const client = new MongoClient(MONGODB_URI);
 let db: any;
 
@@ -14,10 +16,15 @@ async function getDb() {
   return db;
 }
 
-export async function GET(req: Request, { params }: { params: { filename: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ filename: string }> } // params is now a Promise
+) {
   try {
-    const { filename } = params;
-    if (!filename) return NextResponse.json({ success: false, error: "No filename provided" }, { status: 400 });
+    const { filename } = await context.params; // await the Promise
+    if (!filename) {
+      return NextResponse.json({ success: false, error: "No filename provided" }, { status: 400 });
+    }
 
     const db = await getDb();
     const bucket = new GridFSBucket(db, { bucketName: "medicalFiles" });
@@ -30,20 +37,19 @@ export async function GET(req: Request, { params }: { params: { filename: string
     const downloadStream = bucket.openDownloadStreamByName(filename);
     const chunks: Uint8Array[] = [];
 
-    downloadStream.on("data", (chunk) => chunks.push(chunk));
-    downloadStream.on("error", (err) => {
-      console.error(err);
-      return NextResponse.json({ success: false, error: "Failed to read file" }, { status: 500 });
-    });
-
-    return new Promise<NextResponse>((resolve) => {
+    return new Promise<NextResponse>((resolve, reject) => {
+      downloadStream.on("data", (chunk) => chunks.push(chunk));
+      downloadStream.on("error", (err) => {
+        console.error(err);
+        reject(NextResponse.json({ success: false, error: "Failed to read file" }, { status: 500 }));
+      });
       downloadStream.on("end", () => {
         const buffer = Buffer.concat(chunks);
         resolve(
           new NextResponse(buffer, {
             status: 200,
             headers: {
-              "Content-Type": "image/*", // fallback content type
+              "Content-Type": "application/octet-stream", // fallback type
             },
           })
         );

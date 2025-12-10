@@ -261,9 +261,9 @@ export default function PatientDashboardCard({
             </button>
           ))}
         </div>
-          Uploaded Files
+          {/* Uploaded Files */}
         {/* Uploaded Files */}
-        {uploadedFiles.length > 0 && (
+        {/* {uploadedFiles.length > 0 && (
           <div className="mt-6">
             <h4 className="font-semibold text-lg text-teal-700 mb-2">
               Uploaded Files
@@ -298,7 +298,7 @@ export default function PatientDashboardCard({
               })}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
