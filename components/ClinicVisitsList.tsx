@@ -7,20 +7,22 @@ interface ClinicVisit {
   id: string;
   student_name?: string;
   student_id?: string;
-  visit_time?: string; // From JavaFX record
+  visit_time?: string;
   status: string;
   reason?: string;
   recommendation?: string;
-  doctor_name?: string; // optional
-  notes?: string; // optional
+  doctor_name?: string;
+  notes?: string;
   created_at?: string;
 }
 
 interface ClinicVisitsListProps {
-  visits: ClinicVisit[];
+  visits?: ClinicVisit[]; // 👈 allow undefined
 }
 
-export default function ClinicVisitsList({ visits }: ClinicVisitsListProps) {
+export default function ClinicVisitsList({ visits = [] }: ClinicVisitsListProps) {
+  // 👆 DEFAULT: visits = [] ensures .length and .map NEVER crash
+
   const formatDate = (value?: string) => {
     if (!value) return "Unknown date";
 
@@ -68,7 +70,6 @@ export default function ClinicVisitsList({ visits }: ClinicVisitsListProps) {
                 </span>
               </div>
 
-              {/* Reason */}
               {v.reason && (
                 <div className="flex items-start gap-2 mb-2 text-gray-700">
                   <FileText className="w-5 h-5 mt-1 text-blue-600" />
@@ -79,7 +80,6 @@ export default function ClinicVisitsList({ visits }: ClinicVisitsListProps) {
                 </div>
               )}
 
-              {/* Recommendation */}
               {v.recommendation && (
                 <div className="flex items-start gap-2 mb-2 text-gray-700">
                   <Stethoscope className="w-5 h-5 mt-1 text-blue-600" />
@@ -90,7 +90,6 @@ export default function ClinicVisitsList({ visits }: ClinicVisitsListProps) {
                 </div>
               )}
 
-              {/* Optional Doctor Name */}
               {v.doctor_name && (
                 <div className="flex items-start gap-2 mb-2 text-gray-700">
                   <User className="w-5 h-5 mt-1 text-blue-600" />
@@ -101,7 +100,6 @@ export default function ClinicVisitsList({ visits }: ClinicVisitsListProps) {
                 </div>
               )}
 
-              {/* Optional Notes */}
               {v.notes && (
                 <div className="flex items-start gap-2 text-gray-700">
                   <FileText className="w-5 h-5 mt-1 text-blue-600" />

@@ -141,43 +141,6 @@ export default function SearchStudent() {
                 <PatientInfoCard patient={patient || placeholderStudent} />
               </div>
             </div>
-
-            {/* VISITS & REPORTS */}
-            {studentData && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                {/* Clinic Visits */}
-                <div className="bg-white rounded-2xl shadow-md border border-blue-100 p-5">
-                  <h3 className="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
-                    🩺 Clinic Visits
-                  </h3>
-
-                  {visits.length > 0 ? (
-                    <ClinicVisitsList visits={visits} />
-                  ) : (
-                    <p className="text-gray-500 text-sm italic">
-                      No clinic visits recorded for this student.
-                    </p>
-                  )}
-                </div>
-
-                {/* Reports */}
-                <div className="bg-white rounded-2xl shadow-md border border-blue-100 p-5">
-                  <h3 className="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
-                    📄 Medical Reports
-                  </h3>
-
-                  {appointments.length > 0 ? (
-                    <PatientAppointmentsList appointments={appointments} />
-                  ) : (
-                    <p className="text-gray-500 text-sm italic">
-                      No medical reports found for this student.
-                    </p>
-                  )}
-                </div>
-
-              </div>
-            )}
           </div>
         </div>
       </div>

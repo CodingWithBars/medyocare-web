@@ -5,3 +5,12 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   experimental: {
+//     turbo: false, // <-- TURN THIS OFF
+//   },
+// };
+
+// module.exports = nextConfig;
