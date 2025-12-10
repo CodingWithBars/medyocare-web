@@ -7,7 +7,7 @@ import AboutSection from "@/components/AboutSection";
 import EventsSection from "@/components/EventsSection";
 import PatientInfoCard from "@/components/PatientInfoCard";
 import ClinicVisitsList from "@/components/ClinicVisitsList";
-import ReportsList from "@/components/ReportsList";
+import ReportsList from "@/components/PatientAppointmentsList";
 import SearchStudent from "@/components/SearchStudent";
 
 export default function Home() {

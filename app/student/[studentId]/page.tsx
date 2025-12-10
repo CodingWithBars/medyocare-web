@@ -1,7 +1,7 @@
 // app/student/[studentId]/page.tsx
 import PatientInfoCard from "@/components/PatientInfoCard";
 import ClinicVisitsList from "@/components/ClinicVisitsList";
-import ReportsList from "@/components/ReportsList";
+import ReportsList from "@/components/PatientAppointmentsList";
 import clientPromise from "@/lib/mongodb";
 
 export const dynamic = "force-dynamic";

@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
     const client = await clientPromise;
     const db = client.db("medcare_db");
 
+    // Fetch patient
     const rawPatient = await db.collection("patients").findOne(
       { student_id: studentId },
       {
@@ -57,10 +58,38 @@ export async function GET(req: NextRequest) {
         : null,
     };
 
-    const [visits, reports] = await Promise.all([
-      db.collection("clinic_visits").find({ studentRef: studentId }).sort({ visitDate: -1 }).toArray(),
-      db.collection("reports").find({ studentRef: studentId }).sort({ createdAt: -1 }).toArray(),
-    ]);
+    // Fetch clinic visits and map to frontend-friendly structure
+    const rawVisits = await db
+      .collection("appointments") // JavaFX saves in "appointments"
+      .find({ student_id: studentId })
+      .sort({ created_at: -1 })
+      .toArray();
+
+    const visits = rawVisits.map((v) => ({
+      _id: v._id?.toString(),
+      id: v.id,
+      student_name: v.student_name,
+      student_id: v.student_id,
+      visit_time: v.visit_time,
+      status: v.status,
+      reason: v.reason,
+      recommendation: v.recommendation,
+      doctor_name: v.doctor_name || null,
+      notes: v.notes || null,
+      created_at: v.created_at,
+    }));
+
+    // Fetch reports as before
+    const rawReports = await db
+      .collection("reports")
+      .find({ studentRef: studentId })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const reports = rawReports.map((r) => ({
+      ...r,
+      _id: r._id?.toString(),
+    }));
 
     return NextResponse.json({ success: true, patient, visits, reports });
   } catch (err) {

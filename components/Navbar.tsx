@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, LogOut, User, ChevronDown } from "lucide-react";
 
 interface UserType {
@@ -17,8 +18,13 @@ export default function Navbar() {
   const [user, setUser] = useState<UserType | null>(null);
 
   const loadUser = () => {
-    const session = localStorage.getItem("session");
-    setUser(session ? JSON.parse(session) : null);
+    try {
+      const session = localStorage.getItem("session");
+      setUser(session ? JSON.parse(session) : null);
+    } catch (e) {
+      console.error("Failed to load user session");
+      setUser(null);
+    }
   };
 
   useEffect(() => {
@@ -27,6 +33,10 @@ export default function Navbar() {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [typeof window !== "undefined" ? window.location.pathname : null]);
 
   const handleLogout = () => {
     localStorage.removeItem("session");
@@ -39,8 +49,13 @@ export default function Navbar() {
       <nav className="container mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 text-2xl font-bold tracking-wide hover:text-teal-600 transition">
-          MedyoCare
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/images/logo.png"
+            alt="School Clinic Logo"
+            width={80}
+            height={80}
+          />
         </Link>
 
         {/* Desktop Menu */}
@@ -76,11 +91,8 @@ export default function Navbar() {
               />
             </button>
 
-            {/* Dropdown */}
             {dropdownOpen && (
-              <div
-                className="absolute top-14 right-0 bg-white border border-blue-100 shadow-lg rounded-xl w-56 py-2 animate-fadeSlide z-50"
-              >
+              <div className="absolute top-14 right-0 bg-white border border-blue-100 shadow-lg rounded-xl w-56 py-2 animate-fadeSlide z-50">
                 <p className="px-4 py-2 text-sm text-gray-500 border-b">
                   Signed in as <br /> <strong>{user.email}</strong>
                 </p>
