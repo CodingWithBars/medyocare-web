@@ -39,7 +39,7 @@ export default function Hero() {
       {/* Left Image */}
       <div className="w-full lg:w-1/2">
         <Image
-          src="/images/school-clinic.png"
+          src="/images/heroimage.jpg"
           alt="School Clinic Illustration"
           width={900}
           height={900}
